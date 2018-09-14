@@ -8,7 +8,7 @@ var relay;    //+
 boardReady({board: 'Smart', device: '10VBGBkQ', transport: 'mqtt'}, function (board) {
     board.systemReset();    //+
     board.samplingInterval = 50;    //+
-    relay = getRelay(board, 11);    //+
+    relay = getRelay(board, 16);    //+
     relay.off();    //+
 });    //+
 
@@ -20,7 +20,8 @@ var bot = linebot({
 
 var message = {
     "你好":"我不好",
-    "你是誰":"我是ㄐ器人"
+    "你是誰":"我是器人",
+    "頭":"我喔",
 };
 
 bot.on('message', function (event) {
