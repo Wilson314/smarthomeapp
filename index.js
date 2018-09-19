@@ -21,7 +21,7 @@ var bot = linebot({
 var message = {
     "你好":"我不好",
     "你是誰":"我是器人",
-    "頭":"我喔",
+    "123":"321",
 };
 
 bot.on('message', function (event) {
