@@ -22,7 +22,6 @@ var message = {
     "你好":"我不好",
     "你是誰":"我是器人",
     "123":"321",
-    "跨三小":"不能看四小嗎?",
 };
 
 bot.on('message', function (event) {
