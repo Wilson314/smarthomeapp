@@ -4,12 +4,15 @@ var path = require('path');
 require("webduino-js"); //+
 require("webduino-blockly");    //+
 var relay;    //+
-
+var dht;
+	
 boardReady({board: 'Smart', device: '10VBGBkQ', transport: 'mqtt'}, function (board) {
-    board.systemReset();    //+
-    board.samplingInterval = 50;    //+
+    board.systemReset();
+    board.samplingInterval = 50;
+    dht = getDht(board, 14);
     relay = getRelay(board, 16);    //+
-    relay.off();    //+
+    relay.off();//+
+    dht.show();
 });    //+
 
 var bot = linebot({
@@ -29,18 +32,19 @@ bot.on('message', function (event) {
     if(message[event.message.text]){
         respone = message[event.message.text];
     }else{
-        //+
-		if(event.message.text == '開燈'){
-            relay.on();    //+
-            respone = '已開燈';    //+
-		}else if(event.message.text == '關燈'){
-            relay.off();    //+
-            respone = '已關燈';    //+
-		}else{
+        if(event.message.text == '開燈'){
+            relay.on(); 
+            respone = '已開燈';
+	}else if(event.message.text == '關燈'){
+            relay.off();
+            respone = '已關燈';
+	}else if(event.message.text == '現在溫濕度多少'){
+            respone = '溫度：' + dht.temperature + '度,濕度：' + dht.humidity + '%';
+	}else{
             respone = '我不懂你說的 ['+event.message.text+']';
         }
     }
-	console.log(event.message.text + ' -> ' + respone);
+    console.log(event.message.text + ' -> ' + respone);
     bot.reply(event.replyToken, respone);
 });
 
