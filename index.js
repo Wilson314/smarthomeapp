@@ -4,7 +4,9 @@ var path = require('path');
 require("webduino-js"); //+
 require("webduino-blockly");    //+
 var relay;    //+
-var dht;
+var temperature = 0;
+var humidity = 0;
+
 	
 boardReady({board: 'Smart', device: '10VBGBkQ', transport: 'mqtt'}, function (board) {
     board.systemReset();
@@ -12,6 +14,10 @@ boardReady({board: 'Smart', device: '10VBGBkQ', transport: 'mqtt'}, function (bo
     dht = getDht(board, 14);
     relay = getRelay(board, 16);    //+
     relay.off();
+    dht.read(function(evt){
+        temperature = dht.temperature;
+	humidity = dht.humidity;
+    }, 1000);
 });    //+
 
 var bot = linebot({
@@ -38,7 +44,7 @@ bot.on('message', function (event) {
             relay.off();
             respone = '已關燈';
 	}else if(event.message.text == '現在溫濕度多少'){
-            respone = '溫度：' + dht.temperature + '度,濕度：' + dht.humidity + '%';
+            respone = '溫度：' + temperature + '度,濕度：' + humidity + '%';
 	}else{
             respone = '我不懂你說的 ['+event.message.text+']';
         }
