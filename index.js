@@ -11,8 +11,7 @@ boardReady({board: 'Smart', device: '10VBGBkQ', transport: 'mqtt'}, function (bo
     board.samplingInterval = 50;
     dht = getDht(board, 14);
     relay = getRelay(board, 16);    //+
-    relay.off();//+
-    dht.show();
+    relay.off();
 });    //+
 
 var bot = linebot({
