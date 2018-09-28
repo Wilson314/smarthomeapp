@@ -43,7 +43,7 @@ bot.on('message', function (event) {
 	}else if(event.message.text == '關燈'){
             relay.off();
             respone = '已關燈';
-	}else if(event.message.text == '現在溫濕度多少'){
+	}else if(event.message.text == '溫濕度'){
             respone = '溫度：' + temperature + '度,濕度：' + humidity + '%';
 	}else{
             respone = '我不懂你說的 ['+event.message.text+']';
