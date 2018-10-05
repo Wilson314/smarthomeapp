@@ -58,10 +58,12 @@ bot.on('beacon', function (event) {
     var respone;
     switch(event.beacon.type){
         case 'enter':
-               respone = '你進入教室';
+               respone = '你進入教室'; 
+	       relay.on();
               break;
         case 'leave':
-             respone = '你離開教室';
+             respone = '你離開教室'; 
+             relay.off();
              break;
         default:
              respone = '我壞掉了';
