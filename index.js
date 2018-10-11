@@ -1,24 +1,24 @@
 var linebot = require('linebot');
 var express = require('express');
 var path = require('path');
-require("webduino-js"); //+
-require("webduino-blockly");    //+
-var relay;    //+
+require("webduino-js");
+require("webduino-blockly");
+var relay;
 var temperature = 0;
 var humidity = 0;
 
-	
+
 boardReady({board: 'Smart', device: '10VBGBkQ', transport: 'mqtt'}, function (board) {
     board.systemReset();
     board.samplingInterval = 50;
     dht = getDht(board, 14);
-    relay = getRelay(board, 16);    //+
+    relay = getRelay(board, 16);
     relay.off();
-    dht.read(function(evt){
+    dht.read(function (evt) {
         temperature = dht.temperature;
-	humidity = dht.humidity;
+        humidity = dht.humidity;
     }, 1000);
-});    //+
+});
 
 var bot = linebot({
     channelId: '1607674263',
@@ -27,48 +27,87 @@ var bot = linebot({
 });
 
 var message = {
-    "你好":"我不好",
-    "你是誰":"我是器人",
-    "123":"321",
+    "你好": function (event) {
+        event.reply("我不好");
+    },
+    "你是誰": function (event) {
+        event.reply("我是器人");
+    },
+    "開燈": function (event) {
+        relay.on();
+        event.reply("已開燈");
+    },
+    "關燈": function (event) {
+        relay.off();
+        event.reply("已關燈");
+    },
+    "溫濕度": function (event) {
+        event.reply("溫度：" + temperature + "度,濕度：" + humidity + "%");
+    }
 };
 
-bot.on('message', function (event) {
-    var respone;
-    if(message[event.message.text]){
-        respone = message[event.message.text];
-    }else{
-        if(event.message.text == '開燈'){
-            relay.on(); 
-            respone = '已開燈';
-	}else if(event.message.text == '關燈'){
-            relay.off();
-            respone = '已關燈';
-	}else if(event.message.text == '溫濕度'){
-            respone = '溫度：' + temperature + '度,濕度：' + humidity + '%';
-	}else{
-            respone = '我不懂你說的 ['+event.message.text+']';
-        }
+bot.on('postback', function (event) {
+    var json = JSON.parse(event.postback.data);
+    switch (json.TYPE) {
+        case "RELAY":
+            if(json.DATA){
+                event.reply("已關燈");
+            }else{
+                event.reply("已開燈");
+            }
+            break;
     }
-    console.log(event.message.text + ' -> ' + respone);
-    bot.reply(event.replyToken, respone);
+});
+
+bot.on('message', function (event) {
+    var requestMessage = event.message.text;
+    if (message[requestMessage]) {
+        message[requestMessage](event);
+    } else {
+        event.reply("我不懂你說的 [" + requestMessage + "]");
+    }
 });
 
 bot.on('beacon', function (event) {
-    console.log('beacon: ' + event.beacon.type);
-    var respone;
-    switch(event.beacon.type){
-        case 'enter':
-               respone = '你進入教室'; 
-	       relay.on();
-              break;
-        case 'leave':
-             respone = '你離開教室'; 
-             relay.off();
-             break;
+    var text = "";
+    var enter = false;
+    switch (event.beacon.type) {
+        case "enter":
+            text = "確定要開燈?";
+            enter = true;
+            break;
+        case "leave":
+            text = "確定要關燈?";
+            enter = false;
+            break;
         default:
-             respone = '我壞掉了';
-     }
-     bot.reply(event.replyToken, respone);
+            event.reply("我壞掉了");
+            return;
+    }
+    event.reply({
+        "type": "text",
+        "text": text,
+        "quickReply": {
+            "items": [
+                {
+                    "type": "action",
+                    "action": {
+                        "type": "postback",
+                        "label": "是",
+                        "data": JSON.stringify({TYPE:"RELAY",DATA: (enter ? true : false)})
+                    }
+                },
+                {
+                    "type": "action",
+                    "action": {
+                        "type": "postback",
+                        "label": "否",
+                        "data": JSON.stringify({TYPE:"RELAY",DATA: (enter ? false : true)})
+                    }
+                }
+            ]
+        }
+    });
 });
 const app = express();
 const linebotParser = bot.parser();
