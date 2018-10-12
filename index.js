@@ -51,9 +51,11 @@ bot.on('postback', function (event) {
     switch (json.TYPE) {
         case "RELAY":
             if(json.DATA){
-                event.reply("已關燈");
-            }else{
                 event.reply("已開燈");
+                relay.on();
+            }else{
+                event.reply("已關燈");
+                relay.off();
             }
             break;
     }
