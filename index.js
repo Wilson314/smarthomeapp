@@ -75,8 +75,9 @@ bot.on('beacon', function (event) {
     var enter = false;
     switch (event.beacon.type) {
         case "enter":
-            relay.on();
-            return;
+            text = "確定要開燈?";
+            enter = true;
+            break;
         case "leave":
             text = "確定要關燈?";
             enter = false;
