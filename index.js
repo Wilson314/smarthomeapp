@@ -41,10 +41,10 @@ bot.on('postback', function (event) {
     switch (json.TYPE) {
         case "RELAY":
             if (json.DATA) {
-                event.reply("已開燈");
+                event.reply("已完成開燈");
                 relay.on();
             } else {
-                event.reply("已關燈");
+                event.reply("已完成關燈");
                 relay.off();
             }
             break;
@@ -54,11 +54,11 @@ bot.on('postback', function (event) {
 const message = {
     "開燈": function (event) {
         relay.on();
-        event.reply("已開燈");
+        event.reply("已完成開燈");
     },
     "關燈": function (event) {
         relay.off();
-        event.reply("已關燈");
+        event.reply("已完成關燈");
     },
     "溫濕度": function (event) {
         event.reply("溫度：" + temperature + "度,濕度：" + humidity + "%");
@@ -89,11 +89,11 @@ bot.on('beacon', function (event) {
     let enter = false;
     switch (event.beacon.type) {
         case "enter":
-            text = "確定要開燈?";
+            text = "請問確定要開燈?";
             enter = true;
             break;
         case "leave":
-            text = "確定要關燈?";
+            text = "請問確定要關燈?";
             enter = false;
             break;
         default:
